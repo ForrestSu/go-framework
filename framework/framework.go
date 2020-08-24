@@ -5,28 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 )
 
 const (
 	StateInit = iota
 	StateRunning
 )
-
-var WrongStateError = errors.New("can not take the operation in the current state")
-
-// 自定义一个error类,并实现Error()接口
-type ServicesError struct {
-	errArr []error
-}
-
-func (se ServicesError) Error() string {
-	var strs []string
-	for _, err := range se.errArr {
-		strs = append(strs, err.Error())
-	}
-	return strings.Join(strs, ";")
-}
 
 /*
  * 定义框架接口
@@ -59,11 +43,53 @@ func NewFrameWork(sizeEvtBuf int) *FrameWork {
 	return &frame
 }
 
+/**
+ * 以下为 Framework 的对外接口
+ */
 func (f *FrameWork) RegisterService(name string, svr IService) error {
 	f.services[name] = svr
 	return nil
 }
 
+func (f *FrameWork) Start() error {
+	if f.state != StateInit {
+		return WrongStateError
+	}
+	f.state = StateRunning
+	f.ctx, f.cancel = context.WithCancel(context.Background())
+	//TODO 先启动一个事件处理协程
+	go f.EventProcessGoroutine()
+	// 然后才启动服务
+	return f.startServices()
+}
+
+func (f *FrameWork) Stop() error {
+	if f.state != StateRunning {
+		return WrongStateError
+	}
+	f.state = StateInit
+	// 通知停止所有的子协程
+	f.cancel()
+	return f.stopServices()
+}
+
+func (f *FrameWork) Destroy() error {
+	if f.state != StateInit {
+		return WrongStateError
+	}
+	return f.destroyServices()
+}
+
+// 实现事件通知接口，用于接收多个子服务的状态
+func (f *FrameWork) OnEvent(evt Event) {
+	f.evtBuf <- evt
+}
+
+
+/**
+ * 以下为 Framework 功能实现
+ * internal func
+ */
 func (f *FrameWork) startServices() error {
 	var err error
 	//var mutex sync.Mutex
@@ -133,39 +159,3 @@ func (f *FrameWork) EventProcessGoroutine() {
 	}
 }
 
-/**
- * 以下为 Framework 的对外接口
- */
-func (f *FrameWork) Start() error {
-	if f.state != StateInit {
-		return WrongStateError
-	}
-	f.state = StateRunning
-	f.ctx, f.cancel = context.WithCancel(context.Background())
-	//TODO 先启动一个事件处理协程
-	go f.EventProcessGoroutine()
-	// 然后才启动服务
-	return f.startServices()
-}
-
-func (f *FrameWork) Stop() error {
-	if f.state != StateRunning {
-		return WrongStateError
-	}
-	f.state = StateInit
-	// 通知停止所有的子协程
-	f.cancel()
-	return f.stopServices()
-}
-
-func (f *FrameWork) Destroy() error {
-	if f.state != StateInit {
-		return WrongStateError
-	}
-	return f.destroyServices()
-}
-
-// 实现事件通知接口，用于接收多个子服务的状态
-func (f *FrameWork) OnEvent(evt Event) {
-	f.evtBuf <- evt
-}

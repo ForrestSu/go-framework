@@ -1,14 +1,13 @@
-package go_framework
+package main
 
 import (
-	. "./src"
 	"fmt"
-	"testing"
+	. "go_framework/framework"
 	"time"
 )
 
-func TestZuvo(t *testing.T){
-	t.Log("begin..")
+func main() {
+	fmt.Println("begin..")
 
 	frame := NewFrameWork(100)
 	c1 := NewDemoService("c1", "work1")
@@ -22,5 +21,5 @@ func TestZuvo(t *testing.T){
 	time.Sleep(time.Second * 1)
 	err := frame.Stop()
 	_ = frame.Destroy()
-	t.Log("OK!", err)
+	fmt.Println("OK!", err)
 }

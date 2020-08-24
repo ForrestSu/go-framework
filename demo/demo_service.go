@@ -1,9 +1,10 @@
-package framework
+package main
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	. "go_framework/framework"
 	"time"
 )
 
