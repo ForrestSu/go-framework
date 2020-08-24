@@ -12,6 +12,7 @@ func main() {
 	frame := NewFrameWork(100)
 	c1 := NewDemoService("c1", "work1")
 	c2 := NewDemoService("c2", "work2")
+
 	_ = frame.RegisterService("c1", c1)
 	_ = frame.RegisterService("c2", c2)
 	if err := frame.Start(); err != nil {
