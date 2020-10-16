@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	. "go_framework/framework"
+	fw "github.com/ForrestSu/go-framework/framework"
 	"time"
 )
 
 func main() {
 	fmt.Println("begin..")
 
-	frame := NewFrameWork(100)
+	frame := fw.NewFrameWork(100)
 	c1 := NewDemoService("c1", "work1")
 	c2 := NewDemoService("c2", "work2")
 

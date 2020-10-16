@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	. "go_framework/framework"
 	"time"
+
+	fw "github.com/ForrestSu/go-framework/framework"
 )
 
 type DemoService struct {
-	evtReceiver EventReceiver
+	evtReceiver fw.EventReceiver
 	agtCtx      context.Context
 	stopChan    chan struct{}
 	name        string
@@ -24,7 +25,7 @@ func NewDemoService(name string, content string) *DemoService {
 	}
 }
 
-func (d *DemoService) Init(evtReceiver EventReceiver) error {
+func (d *DemoService) Init(evtReceiver fw.EventReceiver) error {
 	fmt.Println("initialize demo", d.name)
 	d.evtReceiver = evtReceiver
 	return nil
@@ -43,7 +44,7 @@ func (d *DemoService) Start(ctx context.Context) error {
 		default:
 			time.Sleep(time.Millisecond * 50)
 			// TODO 向 go_framework 上报数据
-			d.evtReceiver.OnEvent(Event{d.name, d.content})
+			d.evtReceiver.OnEvent(fw.Event{Source: d.name, Content: d.content})
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ## go_framework
 
-go micro-service framework
+go micro-service framework, depends on Go 15.
 
 
 ## Author

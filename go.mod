@@ -1,3 +1,3 @@
-module go_framework
+module github.com/ForrestSu/go-framework
 
-go 1.14
+go 1.15
